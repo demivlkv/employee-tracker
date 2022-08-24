@@ -9,9 +9,9 @@ db.connect(err => {
 
     // initialize app if successful connection
     console.log(`
-----------------
-EMPLOYEE MANAGER
-----------------
+--------------------------------
+E M P L O Y E E    M A N A G E R
+--------------------------------
     `);
 
     init();
@@ -24,30 +24,75 @@ const init = () => {
             type: 'list',
             name: 'menu',
             message: 'What would you like to do?',
-            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add a Department', 'Add a Role', 'Add an Employee', 'Update an Employee Role', 'Quit']
+            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Quit']
         }
     ])
     .then(choice => {
-        if (choice === 'View All Departments') {
-            viewDepartments();
-        } else if (choice === 'View All Roles') {
+        if (choice.menu === 'View All Departments') {
+            viewDepts();
+        } else if (choice.menu === 'View All Roles') {
             viewRoles();
-        } else if (choice === 'View All Employees') {
+        } else if (choice.menu === 'View All Employees') {
             viewEmployees();
-        } else if (choice === 'Add a Department') {
-            addDepartment();
-        } else if (choice === 'Add a Role') {
+        } else if (choice.menu === 'Add Department') {
+            addDept();
+        } else if (choice.menu === 'Add Role') {
             addRole();
-        } else if (choice === 'Add an Employee') {
+        } else if (choice.menu === 'Add Employee') {
             addEmployee();
-        } else if (choice === 'Update an Employee Role') {
+        } else if (choice.menu === 'Update Employee Role') {
             updateEmployee();
         } else {
             console.log(`
------------------
-EXITING APP. BYE!
------------------
+----------------------------------
+THANK YOU FOR USING THE APP. BYE !
+----------------------------------
                 `);
+            db.close();
         }
     })
+};
+
+// view all departments
+const viewDepts = () => {
+    const sql = `SELECT * FROM department`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+
+        console.table(res);
+
+        // display initial menu
+        init();
+    });
+};
+
+// view all departments
+const viewRoles = () => {
+    const sql = `SELECT role.id, role.title, department.name AS department, role.salary
+                FROM role
+                LEFT JOIN department ON role.department_id = department.id`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+
+        console.table(res);
+
+        // display initial menu
+        init();
+    });
+};
+
+// view all departments
+const viewEmployees = () => {
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, role.title AS title, department.name AS department, role.salary AS salary, employee.manager_id AS manager
+                FROM employee
+                LEFT JOIN role ON employee.role_id = role.id
+                LEFT JOIN department ON role.department_id = department.id`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+
+        console.table(res);
+
+        // display initial menu
+        init();
+    });
 };
