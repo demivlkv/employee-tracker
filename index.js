@@ -72,11 +72,12 @@ const init = () => {
                 }
             ])
             .then(data => {
+                // add new department into database
                 const sql = `INSERT INTO department (name)
                             VALUES ('${data.dept}')`;
                 db.query(sql, (err, res) => {
                     if (err) throw err;
-                    console.log(`Added ${data.dept} to the database!`);
+                    console.log(`Added ${data.dept} department to the database!`);
 
                     init();
                 });
@@ -85,7 +86,6 @@ const init = () => {
             const sql = `SELECT * FROM department`;
             db.query(sql, (err, res) => {
                 if (err) throw err;
-                // add a new role
                 inquirer.prompt([
                     {
                         type: 'input',
@@ -102,6 +102,7 @@ const init = () => {
                         name: 'deptList',
                         message: 'Which department does the role belong to?',
                         choices: () => {
+                            // display all options including newly-added departments
                             let deptArray = [];
                             for (let i = 0; i < res.length; i++) {
                                 deptArray.push(res[i].name);
@@ -111,25 +112,72 @@ const init = () => {
                     }
                 ])
                 .then(data => {
+                    // take the result & store it as a variable
                     for (let i = 0; i < res.length; i++) {
                         if (res[i].name === data.deptList) {
                             var department = res[i];
                         }
                     }
-
+                    // add a new role into database
                     const sql = `INSERT INTO role (title, salary, department_id)
                                 VALUES (?,?,?)`;
                     const params = [data.role, data.salary, department.id];
                     db.query(sql, params, (err, res) => {
                         if (err) throw err;
-                        console.log(`Added role of ${data.role} to the database!`);
+                        console.log(`Added ${data.role} role to the database!`);
                     
                         init();
                     });
                 });
             });
         } else if (choice.menu === 'Add Employee') {
-            addEmployee();
+            const sql = `SELECT * FROM employee, role`;
+            db.query(sql, (err, res) => {
+                if (err) throw err;
+                inquirer.prompt([
+                    {
+                        type: 'input',
+                        name: 'firstName',
+                        message: "What is the employee's first name?"
+                    },
+                    {
+                        type: 'input',
+                        name: 'lastName',
+                        message: "What is the employee's last name?"
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: "What is the employee's role?",
+                        choices: () => {
+                            // list all roles
+                            
+                        }
+                    },
+                    {
+                        type: 'list',
+                        name: 'manager',
+                        message: "Who is the employee's manager?",
+                        choices: () => {
+                            // list all employees
+                            
+                        }
+                    },
+                ])
+                .then(data => {
+                    // take the result & store it as a variable
+                    // add a new employee into database
+                    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                VALUES (?,?,?,?)`;
+                    const params = [data.firstName, data.lastName, data.role, data.manager];
+                    db.query(sql, params, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Added ${data.firstName} ${data.lastName} to the database!`);
+                    
+                        init();
+                    });
+                });
+            });
         } else if (choice.menu === 'Update Employee Role') {
             updateEmployee();
         } else {
