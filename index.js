@@ -2,6 +2,7 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const db = require('./db/connection');
+const { removeListener } = require('./db/connection');
 
 // connect to database
 db.connect(err => {
@@ -136,76 +137,56 @@ const init = () => {
                 });
             });
         } else if (choice.menu === 'Add Employee') {
-            const sql = `SELECT * FROM employee, role`;
-            db.query(sql, (err, res) => {
+            const sql = `SELECT * FROM role`;
+            db.query(sql, (err, roles) => {
                 if (err) throw err;
-                inquirer.prompt([
-                    {
-                        type: 'input',
-                        name: 'firstName',
-                        message: "What is the employee's first name?"
-                    },
-                    {
-                        type: 'input',
-                        name: 'lastName',
-                        message: "What is the employee's last name?"
-                    },
-                    {
-                        type: 'list',
-                        name: 'role',
-                        message: "What is the employee's role?",
-                        choices: () => {
-                            // display all options for roles
-                            let roleArray = [];
-                            for (let i = 0; i < res.length; i++) {
-                                roleArray.push(res[i].title);
-                            }
-                            // store unique values in Set object
-                            var roles = [...new Set(roleArray)];
-                            return roles;
-                        }
-                    },
-                    {
-                        type: 'list',
-                        name: 'manager',
-                        message: "Who is the employee's manager?",
-                        choices: () => {
-                            // list all options for employees
-                            let managerArray = [];
-                            for (let i = 0; i < res.length; i++) {
-                                managerArray.push(res[i].first_name + ' ' + res[i].last_name);
-                            }
-                            // add 'None' option for no manager option
-                            managerArray.unshift('None');
-                            // store unique values in Set object
-                            var manager = [...new Set(managerArray)];
-                            return manager;
-                        }
-                    },
-                ])
-                .then(data => {
-                    // take result of role & store it as a variable
-                    for (let i = 0; i < res.length; i++) {
-                        if (res[i].title === data.role) {
-                            var role = res[i];
-                        }
-                    }
-                    // take result of manager & store it as a variable
-                    for (let i = 0; i < res.length; i++) {
-                        if (res[i].manager_id === data.manager) {
-                            var manager = res[i];
-                        }
-                    }
-                    // add new employee into database
-                    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-                                VALUES (?,?,?,?)`;
-                    const params = [data.firstName, data.lastName, role.id, data.manager.id];
 
-                    db.query(sql, params, (err, res) => {
-                        if (err) throw err;
-                        console.log(`Added ${data.firstName} ${data.lastName} to the database!`);
-                    
-                        init();
+                db.query(`SELECT * FROM employee`, (err, managers) => {
+                    if (err) throw err;
+                    // create list of managers for employee
+                    managers = managers.map(manager => ({ name: manager.first_name + ' ' + manager.last_name, value: manager.id }));
+                    managers.push({ name: 'None' });
+
+                    inquirer.prompt([
+                        {
+                            type: 'input',
+                            name: 'firstName',
+                            message: "What is the employee's first name?"
+                        },
+                        {
+                            type: 'input',
+                            name: 'lastName',
+                            message: "What is the employee's last name?"
+                        },
+                        {
+                            type: 'list',
+                            name: 'role',
+                            message: "What is the employee's role?",
+                            choices: roles.map(role => ({ name: role.title, value: role.id }))
+                        },
+                        {
+                            type: 'list',
+                            name: 'manager',
+                            message: "Who is the employee's manager?",
+                            choices: managers
+                        },
+                    ])
+                    .then(data => {
+                        // return 'null' if employee has no manager
+                        if (data.manager === 'None') {
+                            data.manager = null;
+                        }
+
+                        // add new employee into database
+                        const sql = `INSERT INTO employee SET ?`;
+                        const params = { first_name: data.firstName, last_name: data.lastName, role_id: data.role, manager_id: data.manager };
+
+                        db.query(sql, params, (err, res) => {
+                            if (err) throw err;
+                            console.log(`Added ${data.firstName} ${data.lastName} to the database!`);
+                        
+                            init();
+                        });
                     });
                 });
             });

@@ -22,7 +22,7 @@ VALUES
 ('Harry', 'Osborn', 2, 1),
 ('Curt', 'Connors', 3, null),
 ('Otto', 'Octavius', 4, 3),
-('Harry', 'Osborn', 5, null),
+('Norman', 'Osborn', 5, null),
 ('Max', 'Dillon', 6, 5),
 ('J. Jonah', 'Jameson', 7, null),
 ('Eddie', 'Brock', 8, 7);
