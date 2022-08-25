@@ -31,18 +31,20 @@ const init = () => {
         if (choice.menu === 'View All Departments') {
             // display all departments
             const sql = `SELECT * FROM department`;
+
             db.query(sql, (err, res) => {
                 if (err) throw err;
                 console.table(res);
 
-            // return to initial menu
-            init();
-        });
+                // return to initial menu
+                init();
+            });
         } else if (choice.menu === 'View All Roles') {
             // display all roles
             const sql = `SELECT role.id, role.title, department.name AS department, role.salary
                         FROM role
                         LEFT JOIN department ON role.department_id = department.id`;
+            
             db.query(sql, (err, res) => {
                 if (err) throw err;
                 console.table(res);
@@ -56,6 +58,7 @@ const init = () => {
                         LEFT JOIN employee m ON e.manager_id = m.id
                         LEFT JOIN role ON e.role_id = role.id
                         LEFT JOIN department ON role.department_id = department.id`;
+            
             db.query(sql, (err, res) => {
                 if (err) throw err;
                 console.table(res);
@@ -75,6 +78,7 @@ const init = () => {
                 // add new department into database
                 const sql = `INSERT INTO department (name)
                             VALUES ('${data.dept}')`;
+
                 db.query(sql, (err, res) => {
                     if (err) throw err;
                     console.log(`Added ${data.dept} department to the database!`);
@@ -122,6 +126,7 @@ const init = () => {
                     const sql = `INSERT INTO role (title, salary, department_id)
                                 VALUES (?,?,?)`;
                     const params = [data.role, data.salary, department.id];
+
                     db.query(sql, params, (err, res) => {
                         if (err) throw err;
                         console.log(`Added ${data.role} role to the database!`);
@@ -150,8 +155,14 @@ const init = () => {
                         name: 'role',
                         message: "What is the employee's role?",
                         choices: () => {
-                            // list all roles
-                            
+                            // display all options for roles
+                            let roleArray = [];
+                            for (let i = 0; i < res.length; i++) {
+                                roleArray.push(res[i].title);
+                            }
+                            // store unique values in Set object
+                            var roles = [...new Set(roleArray)];
+                            return roles;
                         }
                     },
                     {
@@ -159,17 +170,37 @@ const init = () => {
                         name: 'manager',
                         message: "Who is the employee's manager?",
                         choices: () => {
-                            // list all employees
-                            
+                            // list all options for employees
+                            let managerArray = [];
+                            for (let i = 0; i < res.length; i++) {
+                                managerArray.push(res[i].first_name + ' ' + res[i].last_name);
+                            }
+                            // add 'None' option for no manager option
+                            managerArray.unshift('None');
+                            // store unique values in Set object
+                            var manager = [...new Set(managerArray)];
+                            return manager;
                         }
                     },
                 ])
                 .then(data => {
-                    // take the result & store it as a variable
-                    // add a new employee into database
+                    // take result of role & store it as a variable
+                    for (let i = 0; i < res.length; i++) {
+                        if (res[i].title === data.role) {
+                            var role = res[i];
+                        }
+                    }
+                    // take result of manager & store it as a variable
+                    for (let i = 0; i < res.length; i++) {
+                        if (res[i].manager_id === data.manager) {
+                            var manager = res[i];
+                        }
+                    }
+                    // add new employee into database
                     const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
                                 VALUES (?,?,?,?)`;
-                    const params = [data.firstName, data.lastName, data.role, data.manager];
+                    const params = [data.firstName, data.lastName, role.id, data.manager.id];
+
                     db.query(sql, params, (err, res) => {
                         if (err) throw err;
                         console.log(`Added ${data.firstName} ${data.lastName} to the database!`);
