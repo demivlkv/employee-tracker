@@ -21,8 +21,8 @@ VALUES
 ('Peter', 'Parker', 1, null),
 ('Harry', 'Osborn', 2, 1),
 ('Curt', 'Connors', 3, null),
-('Otto', 'Octavius', 4, 2),
+('Otto', 'Octavius', 4, 3),
 ('Harry', 'Osborn', 5, null),
-('Max', 'Dillon', 6, 3),
+('Max', 'Dillon', 6, 5),
 ('J. Jonah', 'Jameson', 7, null),
-('Eddie', 'Brock', 8, 4);
+('Eddie', 'Brock', 8, 7);
