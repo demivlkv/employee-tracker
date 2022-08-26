@@ -24,7 +24,7 @@ const init = () => {
             type: 'list',
             name: 'menu',
             message: 'What would you like to do?',
-            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Employee Managers', 'View Employees by Department', 'Quit']
+            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Employee Managers', 'View Employees by Department', 'Delete Department', 'Delete Role', 'Delete Employee', 'Quit']
         }
     ])
     .then(choice => {
@@ -271,11 +271,7 @@ const init = () => {
                 });
             });
         } else if (choice.menu === 'View Employees by Department') {
-            const sql = `SELECT department.id, department.name
-                        FROM employee e
-                        LEFT JOIN role ON e.role_id = role.id
-                        LEFT JOIN department ON role.department_id = department.id
-                        GROUP BY department_id, department.name`;
+            const sql = `SELECT * FROM department`;
             db.query(sql, (err, departments) => {
                 if (err) throw err;
 
@@ -298,6 +294,84 @@ const init = () => {
                     db.query(sql, data.sortDept, (err, res) => {
                         if (err) throw err;
                         console.table(res);
+                
+                        init();
+                    });
+                });
+            });
+        } else if (choice.menu === 'Delete Department') {
+            const sql = `SELECT * FROM department`;
+            db.query(sql, (err, departments) => {
+                if (err) throw err;
+
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'deleteDept',
+                        message: 'Which department would you like to delete?',
+                        choices: departments.map(department => ({ name: department.name, value: department.id }))
+                    }
+                ])
+                .then(data => {
+                    // remove department by id
+                    const sql = `DELETE FROM department
+                                WHERE department.id = ?`;
+                    
+                    db.query(sql, data.deleteDept, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Deleted department from the database!`);
+                
+                        init();
+                    });
+                });
+            });
+        } else if (choice.menu === 'Delete Role') {
+            const sql = `SELECT * FROM role`;
+            db.query(sql, (err, roles) => {
+                if (err) throw err;
+
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'deleteRole',
+                        message: 'Which role would you like to delete?',
+                        choices: roles.map(role => ({ name: role.title, value: role.id }))
+                    }
+                ])
+                .then(data => {
+                    // remove role by id
+                    const sql = `DELETE FROM role
+                                WHERE role.id = ?`;
+                    
+                    db.query(sql, data.deleteRole, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Deleted role from the database!`);
+                
+                        init();
+                    });
+                });
+            });
+        } else if (choice.menu === 'Delete Employee') {
+            const sql = `SELECT * FROM employee`;
+            db.query(sql, (err, employees) => {
+                if (err) throw err;
+
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'deleteEmp',
+                        message: 'Which department would you like to delete?',
+                        choices: employees.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }))
+                    }
+                ])
+                .then(data => {
+                    // remove employee by id
+                    const sql = `DELETE FROM employee
+                                WHERE employee.id = ?`;
+                    
+                    db.query(sql, data.deleteEmp, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Deleted employee from the database!`);
                 
                         init();
                     });
