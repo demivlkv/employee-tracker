@@ -24,7 +24,7 @@ const init = () => {
             type: 'list',
             name: 'menu',
             message: 'What would you like to do?',
-            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Quit']
+            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Employee Managers', 'Quit']
         }
     ])
     .then(choice => {
@@ -199,34 +199,74 @@ const init = () => {
                     // create list of managers for employee
                     employees = employees.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
 
+                    inquirer.prompt([
+                        {
+                            type: 'list',
+                            name: 'employee',
+                            message: "Which employee's role do you want to update?",
+                            choices: employees
+                        },
+                        {
+                            type: 'list',
+                            name: 'role',
+                            message: 'Which role do you want to assign the selected employee?',
+                            choices: roles.map(role => ({ name: role.title, value: role.id }))
+                        }
+                    ])
+                    .then(data => {
+                        // update employee role in database
+                        const sql = `UPDATE employee SET ? WHERE ?`;
+                        const params = [{ role_id: data.role }, { id: data.employee }];
+
+                        db.query(sql, params, (err, res) => {
+                            if (err) throw err;
+                            console.log(`Updated employee's role in the database!`);
+                        
+                            init();
+                        });
+                    });
+                });
+            });
+        } else if (choice.menu === 'Update Employee Managers') {
+            const sql = `SELECT * FROM employee`;
+            db.query(sql, (err, employees) => {
+                if (err) throw err;
+
+                employees = employees.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+                employees.push({ name: 'None' });
+
                 inquirer.prompt([
                     {
                         type: 'list',
                         name: 'employee',
-                        message: "Which employee's role do you want to update?",
+                        message: "Which employee's manager do you want to update?",
                         choices: employees
                     },
                     {
                         type: 'list',
-                        name: 'role',
-                        message: 'Which role do you want to assign the selected employee?',
-                        choices: roles.map(role => ({ name: role.title, value: role.id }))
+                        name: 'manager',
+                        message: "Who is the employee's manager?",
+                        choices: employees
                     }
                 ])
                 .then(data => {
-                    // update employee role in database
+                    // return 'null' if employee has no manager
+                    if (data.manager === 'None') {
+                        data.manager = null;
+                    }
+
+                    // update employee's manager in database
                     const sql = `UPDATE employee SET ? WHERE ?`;
-                    const params = [{ role_id: data.role }, { id: data.employee }];
+                    const params = [{ manager_id: data.manager }, { id: data.employee }];
 
                     db.query(sql, params, (err, res) => {
                         if (err) throw err;
-                        console.log(`Updated employee's role in the database!`);
+                        console.log(`Updated employee's manager in the database!`);
                     
                         init();
                     });
                 });
             });
-        });
         } else {
             console.log(`
 ----------------------------------
