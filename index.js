@@ -24,7 +24,7 @@ const init = () => {
             type: 'list',
             name: 'menu',
             message: 'What would you like to do?',
-            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Employee Managers', 'Quit']
+            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Employee Managers', 'View Employees by Department', 'Quit']
         }
     ])
     .then(choice => {
@@ -53,7 +53,7 @@ const init = () => {
             });
         } else if (choice.menu === 'View All Employees') {
             // display all employees
-            const sql = `SELECT e.id, e.first_name, e.last_name, role.title AS title, department.name AS department, role.salary AS salary, IFNULL(CONCAT(m.first_name, ' ', m.last_name), 'null') AS manager
+            const sql = `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, IFNULL(CONCAT(m.first_name, ' ', m.last_name), 'null') AS manager
                         FROM employee e
                         LEFT JOIN employee m ON e.manager_id = m.id
                         LEFT JOIN role ON e.role_id = role.id
@@ -232,37 +232,73 @@ const init = () => {
             db.query(sql, (err, employees) => {
                 if (err) throw err;
 
-                employees = employees.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
-                employees.push({ name: 'None' });
+                db.query(sql, (err, managers) => {
+                    if (err) throw err;
+                    managers = managers.map(manager => ({ name: manager.first_name + ' ' + manager.last_name, value: manager.id }));
+                    managers.push({ name: 'None' });
+
+                    inquirer.prompt([
+                        {
+                            type: 'list',
+                            name: 'employee',
+                            message: "Which employee's manager do you want to update?",
+                            choices: employees.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }))
+                        },
+                        {
+                            type: 'list',
+                            name: 'manager',
+                            message: "Who is the employee's manager?",
+                            choices: managers
+                        }
+                    ])
+                    .then(data => {
+                        // return 'null' if employee has no manager
+                        if (data.manager === 'None') {
+                            data.manager = null;
+                        }
+
+                        // update employee's manager in database
+                        const sql = `UPDATE employee SET ? WHERE ?`;
+                        const params = [{ manager_id: data.manager }, { id: data.employee }];
+
+                        db.query(sql, params, (err, res) => {
+                            if (err) throw err;
+                            console.log(`Updated employee's manager in the database!`);
+                        
+                            init();
+                        });
+                    });
+                });
+            });
+        } else if (choice.menu === 'View Employees by Department') {
+            const sql = `SELECT department.id, department.name
+                        FROM employee e
+                        LEFT JOIN role ON e.role_id = role.id
+                        LEFT JOIN department ON role.department_id = department.id
+                        GROUP BY department_id, department.name`;
+            db.query(sql, (err, departments) => {
+                if (err) throw err;
 
                 inquirer.prompt([
                     {
                         type: 'list',
-                        name: 'employee',
-                        message: "Which employee's manager do you want to update?",
-                        choices: employees
-                    },
-                    {
-                        type: 'list',
-                        name: 'manager',
-                        message: "Who is the employee's manager?",
-                        choices: employees
+                        name: 'sortDept',
+                        message: 'Which department of employees would you like to view?',
+                        choices: departments.map(department => ({ name: department.name, value: department.id }))
                     }
                 ])
                 .then(data => {
-                    // return 'null' if employee has no manager
-                    if (data.manager === 'None') {
-                        data.manager = null;
-                    }
-
-                    // update employee's manager in database
-                    const sql = `UPDATE employee SET ? WHERE ?`;
-                    const params = [{ manager_id: data.manager }, { id: data.employee }];
-
-                    db.query(sql, params, (err, res) => {
-                        if (err) throw err;
-                        console.log(`Updated employee's manager in the database!`);
+                    // display employees by department
+                    const sql = `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department
+                                FROM employee e
+                                JOIN role ON e.role_id = role.id
+                                JOIN department ON role.department_id = department.id
+                                WHERE department.id = ?`;
                     
+                    db.query(sql, data.sortDept, (err, res) => {
+                        if (err) throw err;
+                        console.table(res);
+                
                         init();
                     });
                 });
