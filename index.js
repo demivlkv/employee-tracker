@@ -2,7 +2,6 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const db = require('./db/connection');
-const { removeListener } = require('./db/connection');
 
 // connect to database
 db.connect(err => {
@@ -191,7 +190,43 @@ const init = () => {
                 });
             });
         } else if (choice.menu === 'Update Employee Role') {
-            updateEmployee();
+            const sql = `SELECT * FROM role`;
+            db.query(sql, (err, roles) => {
+                if (err) throw err;
+
+                db.query(`SELECT * FROM employee`, (err, employees) => {
+                    if (err) throw err;
+                    // create list of managers for employee
+                    employees = employees.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'employee',
+                        message: "Which employee's role do you want to update?",
+                        choices: employees
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: 'Which role do you want to assign the selected employee?',
+                        choices: roles.map(role => ({ name: role.title, value: role.id }))
+                    }
+                ])
+                .then(data => {
+                    // update employee role in database
+                    const sql = `UPDATE employee SET ? WHERE ?`;
+                    const params = [{ role_id: data.role }, { id: data.employee }];
+
+                    db.query(sql, params, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Updated employee's role in the database!`);
+                    
+                        init();
+                    });
+                });
+            });
+        });
         } else {
             console.log(`
 ----------------------------------
