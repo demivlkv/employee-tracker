@@ -1,7 +1,7 @@
 # Project 12: SQL Challenge
 ## Employee Tracker
 
-This project is a command-line application that is created by Node.js, Inquirer, and MySQL. Employee Tracker serves as a SQL database that enables users (i.e. business owners) to view and manage the departments, roles, and employees in their company. MySQL is used to achieve the main goal for the project, which is to provide a relational database. The ability to easily store and retrieve data makes this database fundamental to the application. MySQL is considered the most reliable, scaleable, and developer-friendly open source relational database management system.
+The purpose of this Employee Tracker project was to build an interface that allow non-developers to easily view and interact with information stored in databases — in which this interface is known as content management systems (CMS). Employee Tracker is a command-line application that is built with Node.js, Inquirer, and MySQL. This application serves as a SQL database that enables users (i.e. business owners) to view and manage the departments, roles, and employees in their company. MySQL is used to achieve the main goal for the project, which is to provide a relational database. The ability to easily store and retrieve data makes this database fundamental to the application. MySQL is considered the most reliable, scaleable, and developer-friendly open source relational database management system.
 
 ![screenshot.png](/../main/assets/images/screenshot.png)
 
@@ -19,11 +19,11 @@ This project is a command-line application that is created by Node.js, Inquirer,
 ```
 npm i mysql2
 ```
-4. Install [Inquirer.js](https://www.npmjs.com/package/inquirer) node package to interact with the user by running the following in the command line of terminal:
+4. Install [Inquirer.js](https://www.npmjs.com/package/inquirer) node package to interact with the user:
 ```
 npm i inquirer
 ```
-5. Lastly, install [console.table](https://www.npmjs.com/package/console.table) node package  to print MySQL rows to the console by running the following in terminal:
+5. Lastly, install [console.table](https://www.npmjs.com/package/console.table) node package  to print MySQL rows to the console:
 ```
 npm i console.table
 ```
@@ -35,7 +35,8 @@ node index.js
 ```
 The **Inquirer** package for Node.js collects input regarding your business within the command line. Enter the necessary information as prompted, and it will organize that info & display them as tables in terminal.
 
-A video demonstration for this application can be found [here](https://#).
+### Video Walkthrough
+[https://youtu.be/0hGVxvQcD_c](https://youtu.be/0hGVxvQcD_c).
 
 ![demo.gif](/../main/assets/images/demo.gif)
 

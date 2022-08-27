@@ -388,11 +388,10 @@ const init = () => {
             });
         } else {
             console.log(`
---------------------------------------------------------------------
-“I wanna do a cartwheel. But real casual-like. 
-Not enough to make a big deal out of it, but I know everyone saw it. 
-One stunning, gorgeous cartwheel.” – Creed Bratton
---------------------------------------------------------------------
+----------------------------------------------------------------------
+“Uh... Work out, plenty of rest. You know, eat your green vegetables."
+                                                    - Spider-Man
+----------------------------------------------------------------------
                 THANK YOU FOR USING THE APP. BYE !
                 `);
             db.close();
