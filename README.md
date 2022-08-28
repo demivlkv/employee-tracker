@@ -1,7 +1,9 @@
 # Project 12: SQL Challenge
 ## Employee Tracker
 
-The purpose of this Employee Tracker project was to build an interface that allow non-developers to easily view and interact with information stored in databases — in which this interface is known as content management systems (CMS). Employee Tracker is a command-line application that is built with Node.js, Inquirer, and MySQL. This application serves as a SQL database that enables users (i.e. business owners) to view and manage the departments, roles, and employees in their company. MySQL is used to achieve the main goal for the project, which is to provide a relational database. The ability to easily store and retrieve data makes this database fundamental to the application. MySQL is considered the most reliable, scaleable, and developer-friendly open source relational database management system.
+The purpose of this Employee Tracker project was to build an interface that allow non-developers to easily view and interact with information stored in databases — in which this interface is known as content management systems (CMS). Employee Tracker is a command-line application that is built with Node.js, Inquirer, and MySQL.
+
+This application serves as a SQL database that enables users (i.e. business owners) to view and manage the departments, roles, and employees in their company. MySQL is used to achieve the main goal for the project, which is to provide a relational database. The ability to easily store and retrieve data makes this database fundamental to the application. MySQL is considered the most reliable, scaleable, and developer-friendly open source relational database management system.
 
 ![screenshot.png](/../main/assets/images/screenshot.png)
 
