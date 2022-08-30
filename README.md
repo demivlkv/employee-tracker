@@ -10,24 +10,16 @@ This application serves as a SQL database that enables users (i.e. business owne
 ### Built With:
 - [Node.js](https://nodejs.org/en/)
 - [MySQL](https://dev.mysql.com/doc/)
-- [Node MySQL2](https://www.npmjs.com/package/mysql2)
-- [Inquirer.js](https://www.npmjs.com/package/inquirer)
-- [console.table](https://www.npmjs.com/package/console.table)
+- [Node MySQL2](https://github.com/sidorares/node-mysql2#readme)
+- [Inquirer.js](https://github.com/SBoudrias/Inquirer.js#readme)
+- [console.table](https://github.com/bahmutov/console.table)
 
 ## Installation
 1. To install this application, `git clone` this repository, or download the `.zip` file in the dropdown after clicking the green ‘Code’ button at the top of this repository—as long as it is in your local branch.
 2. Ensure Node.js is installed.
-3. Install [MySQL2 package](https://www.npmjs.com/package/mysql2) to connect to your MySQL database and perform queries by entering the following into the command line of terminal:
+3. Install all of the npm dependencies needed for this application by entering the following in the command-line of terminal:
 ```
-npm i mysql2
-```
-4. Install [Inquirer.js](https://www.npmjs.com/package/inquirer) node package to interact with the user:
-```
-npm i inquirer
-```
-5. Lastly, install [console.table](https://www.npmjs.com/package/console.table) node package  to print MySQL rows to the console:
-```
-npm i console.table
+npm i mysql2 inquirer console.table
 ```
 
 ## Usage
