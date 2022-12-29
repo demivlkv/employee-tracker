@@ -15,7 +15,7 @@ This application serves as a SQL database that enables users (i.e. business owne
 - [console.table](https://github.com/bahmutov/console.table)
 
 ## Installation
-1. To install this application, `git clone` this repository, or download the `.zip` file in the dropdown after clicking the green ‘Code’ button at the top of this repository—as long as it is in your local branch.
+1. To install this application, `git clone` this repository, or download the `.zip` file in the dropdown after clicking the ‘Code’ button at the top of this repository—as long as it is in your local branch.
 2. Ensure Node.js is installed.
 3. Install all of the npm dependencies needed for this application by entering the following in the command-line of terminal:
 ```
